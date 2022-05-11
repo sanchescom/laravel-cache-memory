@@ -27,7 +27,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Sanchescom\\Cache\\": "src/"
+            "Sanchescom\\": "src/"
         }
     },
     "scripts": {
