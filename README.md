@@ -1,6 +1,6 @@
 # Laravel Cache Memory
 
-Laravel cache memory driver which use shared memory functions. 
+Laravel cache memory driver which use shared memory functions.
 
 Shmop is an easy to use set of functions that allows PHP to read, write, create and delete Unix shared memory segments.
 
@@ -12,7 +12,7 @@ segment of memory that they can both read to and write from to communicate with 
 Require this package, with [Composer](https://getcomposer.org/), in the root directory of your project.
 
 ``` bash
-$ composer require sanchescom/laravel-cache-memory
+composer require sanchescom/laravel-cache-memory
 ```
 
 ### Laravel 5.x:
