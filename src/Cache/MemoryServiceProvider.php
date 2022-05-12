@@ -3,9 +3,9 @@
 namespace Sanchescom\Cache;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Cache\CacheServiceProvider as ServiceProvider;
+use Illuminate\Support\ServiceProvider;
 
-class CacheServiceProvider extends ServiceProvider
+class MemoryServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.

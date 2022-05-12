@@ -41,7 +41,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Sanchescom\\Cache\\CacheServiceProvider"
+                "Sanchescom\\Cache\\MemoryServiceProvider"
             ]
         }
     }
