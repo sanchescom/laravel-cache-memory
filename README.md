@@ -22,7 +22,7 @@ After updating composer, add the ServiceProvider to the providers array in `conf
  ```php
 'providers' => [
     ...
-    Sanchescom\Cache\CacheServiceProvider::class,
+    Sanchescom\Cache\MemoryServiceProvider::class,
 ],
 ```
 
@@ -31,7 +31,7 @@ After updating composer, add the ServiceProvider to the providers array in `conf
 After updating composer add the following lines to register provider in `bootstrap/app.php`
 
 ```php
-$app->register(Sanchescom\Cache\CacheServiceProvider::class);
+$app->register(Sanchescom\Cache\MemoryServiceProvider::class);
 ```
 
 ## Configuration
