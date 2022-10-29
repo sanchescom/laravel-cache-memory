@@ -161,7 +161,15 @@ class MemoryStore implements StoreInterface
     }
 
     /**
-     * Save data in memory storage
+     * Save data in memory storage.
+     *
+     * If the given data will exceed the in-system memory block size limit,
+     * then a garbage collection (GC) is performed on the data array where expired items are discarded.
+     * A new data array containing the survivors of the GC will be created.
+     *
+     * After the GC, if the new data array will still exceed the in-system memory block size limit,
+     * then the in-system memory block will be marked for deletion.
+     * Updated settings, e.g. the updated memory size, will then be applied when the memory block is recreated.
      *
      * @param $data
      *
@@ -169,11 +177,36 @@ class MemoryStore implements StoreInterface
      */
     protected function setStorage($data)
     {
-        $this->memory->write($this->serialize($data));
+        $serial = (string) $this->serialize($data);
+        $memorySize = $this->memory->getSizeInMemory();
+
+        if (strlen($serial) > $memorySize) {
+            $timeNow = $this->currentTime();
+
+            foreach ($data as $key => $details) {
+                $expiresAt = $details['expiresAt'] ?? 0;
+
+                if ($expiresAt !== 0 && $timeNow > $expiresAt) {
+                    unset($data[$key]);
+                }
+            }
+
+            $serial = (string) $this->serialize($data);
+
+            if (strlen($serial) > $memorySize) {
+                trigger_error("Laravel Memory Cache: Out of memory (Unix allocated $memorySize); the segment will be recreated.", E_USER_WARNING);
+
+                $this->memory->delete();
+            } else {
+                trigger_error("Laravel Memory Cache: Out of memory (Unix allocated $memorySize); garbage collection was performed.", E_USER_NOTICE);
+            }
+        }
+
+        $this->memory->write($serial);
     }
 
     /**
-     * Get data from memory storage
+     * Get data from memory storage.
      *
      * @return array
      */

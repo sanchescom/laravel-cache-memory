@@ -63,3 +63,13 @@ use Illuminate\Support\Facades\Cache;
 
 $data = Cache::store('memory')->get('some_key');
 ```
+
+## About memory limits
+Garbage collection (by removing expired items) will be performed when the cache is near the size limit.
+If the garbage collection fails to reduce the size of the cache below the size limit,
+then the cache will be invalidated and the underlying memory segment is marked for deletion. 
+
+Note: **items that are stored as "forever" may be removed when the cache reaches its size limit**.
+
+### Recreating the memory block
+When recreating the memory block, the newest size limit defined in the Laravel config file will be used.
