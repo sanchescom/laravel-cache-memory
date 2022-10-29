@@ -207,9 +207,9 @@ class MemoryBlock
      * Note that this is the size of the actual memory block managed by the OS kernel.
      *
      * This size can be different from the size obtained from getSize().
-     * When the specified memory size is updated by the user, 
+     * When the specified memory size is updated by the user,
      * the OS must delete and recreate the memory block so that the new size can be applied.
-     * 
+     *
      * @return int
      */
     public function getSizeInMemory()

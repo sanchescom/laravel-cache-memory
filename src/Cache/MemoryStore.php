@@ -191,14 +191,18 @@ class MemoryStore implements StoreInterface
                 }
             }
 
+            $message = "Laravel Memory Cache: Out of memory (Unix allocated $memorySize); ";
+
             $serial = (string) $this->serialize($data);
 
             if (strlen($serial) > $memorySize) {
-                trigger_error("Laravel Memory Cache: Out of memory (Unix allocated $memorySize); the segment will be recreated.", E_USER_WARNING);
+                $message .= 'the segment will be recreated.';
+                trigger_error($message, E_USER_WARNING);
 
                 $this->memory->delete();
             } else {
-                trigger_error("Laravel Memory Cache: Out of memory (Unix allocated $memorySize); garbage collection was performed.", E_USER_NOTICE);
+                $message .= 'garbage collection was performed.';
+                trigger_error($message, E_USER_NOTICE);
             }
         }
 
