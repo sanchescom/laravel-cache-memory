@@ -276,4 +276,19 @@ class MemoryStore implements StoreInterface
     {
         return is_numeric($value) ? $value : @unserialize($value);
     }
+
+    /**
+     * Requests to the OS kernel that the underlying shared memory segment should be deleted.
+     *
+     * This allows the memory segment to be recreated later with updated parameters.
+     *
+     * The timing of deletion is managed by the OS kernel, but this usually happens after
+     * all relevant processes are disconnected from the shared memory segment.
+     *
+     * @return void
+     */
+    public function requestDeletion()
+    {
+        $this->memory->delete();
+    }
 }
