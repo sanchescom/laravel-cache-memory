@@ -35,6 +35,10 @@ class MemoryStore implements StoreInterface
     {
         $storage = $this->getStorage();
 
+        if ($storage === false) {
+            return null;
+        }
+
         if (!isset($storage[$key])) {
             return null;
         }
@@ -65,6 +69,11 @@ class MemoryStore implements StoreInterface
     {
         $storage = $this->getStorage();
 
+        if ($storage === false) {
+            // PHP-8.1 auto-vivication from false is deprecated
+            $storage = [];
+        }
+
         $storage[$key] = [
             'value' => $value,
             'expiresAt' => $this->calculateExpiration($seconds),
@@ -87,7 +96,7 @@ class MemoryStore implements StoreInterface
     {
         $storage = $this->getStorage();
 
-        if (!isset($storage[$key])) {
+        if (!$storage || !isset($storage[$key])) {
             $this->forever($key, $value);
 
             return $storage[$key]['value'];
@@ -136,6 +145,11 @@ class MemoryStore implements StoreInterface
     public function forget($key)
     {
         $storage = $this->getStorage();
+
+        if ($storage === false) {
+            // prevents "array_key_exists() argument 2 must be of type array, bool given"
+            return false;
+        }
 
         if (array_key_exists($key, $storage)) {
             unset($storage[$key]);
