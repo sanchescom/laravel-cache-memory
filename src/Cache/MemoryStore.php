@@ -16,12 +16,22 @@ class MemoryStore implements StoreInterface
     /** @var \Sanchescom\Cache\MemoryBlock */
     protected $memory;
 
+    /** @var resource */
+    private $semaphore;
+
+    /** @var bool */
+    private $ignoreNextLock;        
+
     /**
      * @param \Sanchescom\Cache\MemoryBlock
      */
     public function __construct(MemoryBlock $memoryBlock)
     {
         $this->memory = $memoryBlock;
+
+        $this->semaphore = sem_get(ftok(__FILE__, 's'));
+
+        $this->ignoreNextLock = false;
     }
 
     /**
@@ -59,6 +69,8 @@ class MemoryStore implements StoreInterface
     /**
      * Store an item in the cache for a given number of seconds.
      *
+     * This action is atomic.
+     *
      * @param string $key
      * @param mixed $value
      * @param int $seconds
@@ -67,6 +79,13 @@ class MemoryStore implements StoreInterface
      */
     public function put($key, $value, $seconds)
     {
+        sem_acquire($this->semaphore, $this->ignoreNextLock);
+
+        if ($this->ignoreNextLock) {
+            // needed to handle "increment from nothing" case
+            $this->ignoreNextLock = false;
+        }
+
         $storage = $this->getStorage();
 
         if ($storage === false) {
@@ -81,11 +100,15 @@ class MemoryStore implements StoreInterface
 
         $this->setStorage($storage);
 
+        sem_release($this->semaphore);
+
         return true;
     }
 
     /**
      * Increment the value of an item in the cache.
+     *
+     * This action is atomic.
      *
      * @param string $key
      * @param mixed $value
@@ -94,9 +117,13 @@ class MemoryStore implements StoreInterface
      */
     public function increment($key, $value = 1)
     {
+        sem_acquire($this->semaphore);
+
         $storage = $this->getStorage();
 
         if (!$storage || !isset($storage[$key])) {
+            $this->ignoreNextLock = true;
+
             $this->forever($key, $value);
 
             return $storage[$key]['value'];
@@ -106,11 +133,15 @@ class MemoryStore implements StoreInterface
 
         $this->setStorage($storage);
 
+        sem_release($this->semaphore);
+
         return $storage[$key]['value'];
     }
 
     /**
      * Decrement the value of an item in the cache.
+     *
+     * This action is atomic (managed by increment()).
      *
      * @param string $key
      * @param mixed $value
@@ -125,6 +156,8 @@ class MemoryStore implements StoreInterface
     /**
      * Store an item in the cache indefinitely.
      *
+     * This action is atomic (managed by put()).
+     *
      * @param string $key
      * @param mixed $value
      *
@@ -138,12 +171,16 @@ class MemoryStore implements StoreInterface
     /**
      * Remove an item from the cache.
      *
+     * This action is atomic.
+     *
      * @param string $key
      *
      * @return bool
      */
     public function forget($key)
     {
+        sem_acquire($this->semaphore);
+
         $storage = $this->getStorage();
 
         if ($storage === false) {
@@ -156,8 +193,12 @@ class MemoryStore implements StoreInterface
 
             $this->setStorage($storage);
 
+            sem_release($this->semaphore);
+
             return true;
         }
+
+        sem_release($this->semaphore);
 
         return false;
     }
@@ -165,11 +206,17 @@ class MemoryStore implements StoreInterface
     /**
      * Remove all items from the cache.
      *
+     * This action is atomic.
+     *
      * @return bool
      */
     public function flush()
     {
+        sem_acquire($this->semaphore);
+
         $this->setStorage([]);
+
+        sem_release($this->semaphore);
 
         return true;
     }

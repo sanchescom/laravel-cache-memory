@@ -7,6 +7,8 @@ Shmop is an easy to use set of functions that allows PHP to read, write, create 
 Shared memory an IPC1 mechanism native to UNIX. In essence, it’s about two processes sharing a common
 segment of memory that they can both read to and write from to communicate with one another.
 
+Locks and semaphores are used to ensure atomic access so that multiple PHP processes can concurrently use the same shared memory safely. 
+
 ## Installing
 
 Require this package, with [Composer](https://getcomposer.org/), in the root directory of your project.
