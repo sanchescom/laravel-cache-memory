@@ -19,8 +19,8 @@
         "php" : "^7.3|^8.0",
         "ext-shmop": "*",
         "ext-sysvsem": "*",
-        "illuminate/support": "^8.0|^9.0",
-        "illuminate/cache": "^8.0|^9.0"
+        "illuminate/support": "^8.0|^9.0|^10.0",
+        "illuminate/cache": "^8.0|^9.0|^10.0"
     },
     "require-dev": {
         "phpunit/phpunit" : "^9.0",
