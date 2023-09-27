@@ -63,3 +63,27 @@ use Illuminate\Support\Facades\Cache;
 
 $data = Cache::store('memory')->get('some_key');
 ```
+
+## About memory limits
+Garbage collection (by removing expired items) will be performed when the cache is near the size limit.
+If the garbage collection fails to reduce the size of the cache below the size limit,
+then the cache will be invalidated and the underlying memory segment is marked for deletion.
+
+Running out of memory will generate a warning or a notice in your logs, no matter if it is resolved by
+a garbage collection or by segment deletion.
+
+Note: **items that are stored as "forever" may be removed when the cache reaches its size limit**.
+
+### Recreating the memory block
+When recreating the memory block, the newest size limit defined in the Laravel config file will be used.
+
+### Manually marking the memory segment for deletion
+There are use cases to this, such as wanting to refresh the memory block now instead of waiting for 
+another "out of memory" event. In this case, you may do the following:
+
+```php
+// the deletion will be managed by the OS kernel , and will happen at a future time
+Cache::store('memory')->getStore()->requestDeletion();
+```
+
+This usage will not trigger any warnings or notices since this is an action taken deliberately.
